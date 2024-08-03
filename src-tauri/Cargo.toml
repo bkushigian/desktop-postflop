@@ -2,7 +2,7 @@
 name = "desktop-postflop"
 version = "0.2.7"
 description = "The most advanced open-source GTO solver"
-authors = ["Wataru Inariba"]
+authors = ["Wataru Inariba", "Ben Kushigian"]
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/bkushigian/desktop-postflop/tree/main/src-tauri"
 edition = "2021"
