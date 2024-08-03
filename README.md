@@ -1,6 +1,6 @@
 # Desktop Postflop
 
-This is a fork of [b-inary's desktop postflop] that I will be actively maintaining.
+This is a fork of [b-inary's desktop postflop] that I will be maintaining.
 
 > [!IMPORTANT]
 > **As of October 2023, I have started developing a poker solver as a business and have decided to suspend development of this open-source project. See [this issue] for more information.**
