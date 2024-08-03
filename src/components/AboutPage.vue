@@ -5,9 +5,9 @@
     <a
       target="_blank"
       class="link"
-      href="https://github.com/b-inary/desktop-postflop"
+      href="https://github.com/bkushigian/desktop-postflop"
     >
-      https://github.com/b-inary/desktop-postflop
+      https://github.com/bkushigian/desktop-postflop
     </a>
   </p>
 </template>

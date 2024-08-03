@@ -31,7 +31,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "b-inary.desktop-postflop",
+      "identifier": "bkushigian.desktop-postflop",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

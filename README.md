@@ -1,9 +1,12 @@
 # Desktop Postflop
 
+This is a fork of [b-inary's desktop postflop] that I will be maintaining.
+
 > [!IMPORTANT]
 > **As of October 2023, I have started developing a poker solver as a business and have decided to suspend development of this open-source project. See [this issue] for more information.**
 
 [this issue]: https://github.com/b-inary/postflop-solver/issues/46
+[b-inary's desktop postflop]: https://github.com/b-inary/desktop-postflop
 
 ---
 
@@ -17,7 +20,7 @@ However, if you want to use the solver for more serious purposes, please conside
 [Tauri]: https://tauri.app/
 
 **Related repositories**
-- Solver engine: https://github.com/b-inary/postflop-solver
+- Solver engine: https://github.com/bkushigian/postflop-solver
 
 ## Comparison to WASM Postflop
 
@@ -91,6 +94,24 @@ $ npm install
 $ npm run tauri build
 ```
 
+> **Note** there is an issue with nightly builds of the time crate. If you get the following error:
+```bash
+error[E0282]: type annotations needed for `Box<_>`
+  --> /Users/benku/.cargo/registry/src/index.crates.io-6f17d22bba15001f/time-0.3.29/src/format_description/parse/mod.rs:83:9
+   |
+83 |     let items = format_items
+   |         ^^^^^
+...
+86 |     Ok(items.into())
+   |              ---- type must be known at this point
+   |
+help: consider giving `items` an explicit type, where the placeholders `_` are specified
+   |
+83 |     let items: Box<_> = format_items
+   |              ++++++++
+```
+> run the command `cargo update -p time`.
+
 If the build was successful, you should be able to find the application in the `src-tauri/target/release/bundle/` directory.
 
 If you want to use stable Rust instead of nightly Rust, please modify the following line in `src-tauri/Cargo.toml` (performance will be sacrificed):
@@ -98,15 +119,15 @@ If you want to use stable Rust instead of nightly Rust, please modify the follow
 ```diff
 [dependencies]
 ...
-- postflop-solver = { git = "https://github.com/b-inary/postflop-solver", features = ["custom-alloc"] }
-+ postflop-solver = { git = "https://github.com/b-inary/postflop-solver" }
+- postflop-solver = { git = "https://github.com/bkushigian/postflop-solver", features = ["custom-alloc"] }
++ postflop-solver = { git = "https://github.com/bkushigian/postflop-solver" }
 ```
 
 [Rust]: https://www.rust-lang.org/learn/get-started
 [Node.js]: https://nodejs.org/en/
 [Tauri documentation]: https://tauri.app/v1/guides/getting-started/prerequisites/#setting-up-linux
 
-## ~~Roadmap (in order of priority)~~
+## Roadmap (in order of priority)
 
 - Results saving/loading feature ([#8](https://github.com/b-inary/desktop-postflop/issues/8))
 - Hand filter feature for the result viewer ([#6](https://github.com/b-inary/desktop-postflop/issues/6))
