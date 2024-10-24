@@ -54,6 +54,45 @@
     >
       <ResultViewer />
     </div>
+
+    <div
+      v-show="store.navView === 'file'"
+      class="flex w-full mx-auto max-w-screen-xl"
+      style="height: calc(max(100%, 720px) - 2.5rem)"
+    >
+      <FileSideBar style="height: calc(100% - 2rem)"  />
+
+      <div
+        class="flex-grow my-4 px-6 pt-2 overflow-y-auto"
+        style="height: calc(100% - 2rem)"
+      >
+        <div class="flex">
+          <div
+            :class="
+              'mb-5 pl-2 pr-3 pb-0.5 text-lg font-bold border-l-8 border-b-2 ' +
+              'border-blue-600 rounded rounded-br-none'
+            "
+          >
+            {{ fileHeader }}
+          </div>
+        </div>
+
+        <!-- Save Tree -->
+        <div v-show="store.fileSideView === 'save-tree'">
+          TODO: Save Tree
+        </div>
+
+        <!-- Load Tree -->
+        <div v-show="store.fileSideView === 'load-tree'">
+            TODO: Load Tree
+        </div>
+
+        <!-- Load and Resolve Tree -->
+        <div v-show="store.fileSideView === 'load-and-resolve-tree'">
+          TODO: Load and Resolve Tree
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -61,8 +100,11 @@
 import { computed, ref } from "vue";
 import { useStore } from "../store";
 
+
+
 import NavBar from "./NavBar.vue";
 import SideBar from "./SideBar.vue";
+import FileSideBar from "./FileSideBar.vue";
 import RangeEditor from "./RangeEditor.vue";
 import BoardSelector from "./BoardSelector.vue";
 import TreeConfig from "./TreeConfig.vue";
@@ -73,6 +115,7 @@ import ResultViewer from "./ResultViewer.vue";
 
 const store = useStore();
 const header = computed(() => store.headers[store.sideView].join(" > "));
+const fileHeader = computed(() => store.headers[store.fileSideView].join(" > "));
 
 const clientHeight = ref(0);
 const updateClientHeight = () => {

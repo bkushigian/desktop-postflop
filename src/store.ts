@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { sanitizeBetString } from "./utils";
 
-export type NavView = "solver" | "results";
+export type NavView = "solver" | "results" | "file";
 
 export type SideView =
   | "oop-range"
@@ -11,6 +11,11 @@ export type SideView =
   | "bunching"
   | "run-solver"
   | "about";
+
+  export type FileSideView = 
+  | "save-tree"
+  | "load-tree"
+  | "load-and-resolve-tree"
 
 export const saveConfigTmp = () => {
   const config = useConfigStore();
@@ -84,6 +89,7 @@ export const useStore = defineStore("app", {
   state: () => ({
     navView: "solver" as NavView,
     sideView: "oop-range" as SideView,
+    fileSideView: "load-tree" as FileSideView,
     headers: {
       about: ["About"],
       "oop-range": ["OOP Range"],
@@ -92,6 +98,9 @@ export const useStore = defineStore("app", {
       "tree-config": ["Tree Configuration"],
       bunching: ["Bunching Effect"],
       "run-solver": ["Run Solver"],
+      "save-tree": ["Save Tree"],
+      "load-tree": ["Load Tree"],
+      "load-and-resolve-tree": ["Load & Resolve Tree"],
     },
     ranges: Array.from({ length: 6 }, () =>
       Array.from({ length: 13 * 13 }, () => 0)

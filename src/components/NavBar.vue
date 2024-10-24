@@ -24,9 +24,11 @@
         </a>
       </div>
 
+      <!-- Nav Tabs -->
       <div
         class="flex absolute w-full h-full left-0 top-0 gap-3 justify-center"
       >
+        <!-- Results -->
         <button
           :class="
             'flex relative w-32 items-center justify-center font-semibold ' +
@@ -38,6 +40,7 @@
           <ComputerDesktopIcon class="w-6 h-6" />
           <span class="pl-3">Solver</span>
         </button>
+        <!-- Results -->
         <button
           :class="
             'flex relative w-32 items-center justify-center font-semibold ' +
@@ -49,14 +52,29 @@
           <ChartBarIcon class="w-6 h-6" />
           <span class="pl-3">Results</span>
         </button>
+
+        <!-- File -->
+        <button
+          :class="
+            'flex relative w-32 items-center justify-center font-semibold ' +
+            'transition-colors hover:bg-slate-700 hover:text-blue-200 ' +
+            (store.navView === 'file' ? 'bg-slate-700 text-blue-200' : '')
+          "
+          @click="store.navView = 'file'"
+        >
+          <DocumentIcon class="w-6 h-6" />
+          <span class="pl-3">File</span>
+        </button>
       </div>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
+import { CheckIcon } from "@heroicons/vue/20/solid";
 import { useStore } from "../store";
-import { ComputerDesktopIcon, ChartBarIcon } from "@heroicons/vue/24/solid";
+import { ComputerDesktopIcon, ChartBarIcon, CogIcon, GifIcon } from "@heroicons/vue/24/solid";
+import { DocumentIcon } from "@heroicons/vue/24/outline";
 
 const store = useStore();
 </script>
