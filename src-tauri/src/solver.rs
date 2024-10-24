@@ -66,6 +66,14 @@ pub fn weighted_average(slice: &[f32], weights: &[f32]) -> f64 {
 }
 
 #[tauri::command(async)]
+pub fn game_load(
+    game_state: tauri::State<Mutex<PostFlopGame>>,
+    pfs_file: String
+) -> Option<String> {
+    Some("Error: Not Implemented".to_string())
+}
+
+#[tauri::command(async)]
 pub fn game_init(
     range_state: tauri::State<Mutex<RangeManager>>,
     game_state: tauri::State<Mutex<PostFlopGame>>,

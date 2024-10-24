@@ -2,6 +2,7 @@
   <div class="min-w-[1080px]" :style="{ height: clientHeight + 'px' }">
     <NavBar />
 
+    <!-- Solver Tab -->
     <div
       v-show="store.navView === 'solver'"
       class="flex w-full mx-auto max-w-screen-xl"
@@ -48,6 +49,7 @@
       </div>
     </div>
 
+    <!-- Results Tab -->
     <div
       v-show="store.navView === 'results'"
       style="height: calc(max(100%, 720px) - 2.5rem)"
@@ -55,6 +57,7 @@
       <ResultViewer />
     </div>
 
+    <!-- File Tab -->
     <div
       v-show="store.navView === 'file'"
       class="flex w-full mx-auto max-w-screen-xl"
@@ -79,12 +82,14 @@
 
         <!-- Save Tree -->
         <div v-show="store.fileSideView === 'save-tree'">
-          TODO: Save Tree
+          <div class="flex w-full mx-auto">
+          <FileSelect />
+          </div>
         </div>
 
         <!-- Load Tree -->
         <div v-show="store.fileSideView === 'load-tree'">
-            TODO: Load Tree
+          <FileSelect />
         </div>
 
         <!-- Load and Resolve Tree -->
@@ -105,6 +110,7 @@ import { useStore } from "../store";
 import NavBar from "./NavBar.vue";
 import SideBar from "./SideBar.vue";
 import FileSideBar from "./FileSideBar.vue";
+import FileSelect from "./TreeLoader.vue";
 import RangeEditor from "./RangeEditor.vue";
 import BoardSelector from "./BoardSelector.vue";
 import TreeConfig from "./TreeConfig.vue";

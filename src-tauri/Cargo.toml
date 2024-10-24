@@ -23,7 +23,7 @@ tauri = { version = "1.5.0", features = [
     "fs-write-file",
     "shell-open",
 ] }
-postflop-solver = { git = "https://github.com/bkushigian/postflop-solver", features = [
+postflop-solver = { git = "https://github.com/bkushigian/postflop-solver", branch="bkushigian/issue2", features = [
     "custom-alloc",
 ] }
 rayon = "1.8.0"

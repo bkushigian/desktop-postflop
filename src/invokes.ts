@@ -237,6 +237,10 @@ export const gameInit = async (
   });
 };
 
+export const gameLoad = async (pfsFile: string ): Promise<string | null> => {
+  return await invoke("game_load", { pfsFile });
+};
+
 export const gamePrivateCards = async (): Promise<number[][]> => {
   return await invoke("game_private_cards");
 };
