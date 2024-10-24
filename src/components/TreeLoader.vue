@@ -11,7 +11,7 @@
 
     <!-- Custom button -->
 
-    <button class="button-base button-blue" @click="triggerTreeLoadDialog">
+    <button class="button-base button-blue" @click="promptUserAndLoadTree">
       Load Tree
     </button>
   </div>
@@ -20,42 +20,59 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue';
+import { useStore } from "../store";
+import { dialog } from '@tauri-apps/api';
 import * as invokes from "../invokes";
-export default {
-  data() {
-    return {
-      fileName: null, // to store the file name
-      error: null,
-    };
-  },
-  methods: {
 
-    /**
-     * Handle the click on our button
-     */
-    triggerTreeLoadDialog() {
-      // Trigger the hidden file input click event
-      this.$refs.fileInput.click();
-    },
-    handleFileUpload(event) {
-      this.error = null;
-      const file = event.target.files[0]; // get the selected file
+// We need the store for loading trees.
+const store = useStore();
+const treePath = ref(null); // to store the file path
+const loadErrorMsg = ref(null);    // to store the error message
 
-      if (file) {
-        this.fileName = file.name; // store the file name for display
-        this.loadFile(file); // call a method to handle the file
+async function openFileDialog() {
+  try {
+    const selectedPath = await dialog.open({ multiple: false });
+    if (selectedPath) {
+      treePath.value = selectedPath;
+      console.log("Selected file path:", treePath.value);
+    }
+  } catch (error) {
+    console.error("Error selecting file:", error);
+  }
+}
+
+async function promptUserAndLoadTree(resolve) {
+  const oldFilePath = treePath.value;
+  treePath.value = null;
+  await openFileDialog();
+  if (treePath.value) {
+    await reloadTree();
+  } else {
+    treePath.value = oldFilePath;
+  }
+}
+
+async function reloadTree() {
+  if (treePath.value) {
+    try {
+      loadErrorMsg.value = await invokes.gameLoad(treePath.value);
+      if (loadErrorMsg.value) {
+        console.log("Couldn't load tree: ", loadErrorMsg.value);
+      } else {
+        store.isSolverLoaded = true;
+        store.isSolverFinished = true;
+        console.log("store", store);
+        console.log("Successfully loaded tree: ", treePath.value);
       }
-    },
-    loadFile(file) {
-      console.log("Loading file", file);
-      const error = invokes.gameLoad(file);
-      if (error) {
-        this.error = error;
-      }
-    },
-  },
-};
+    } catch (error) {
+      console.error("Error invoking backend:", error);
+    }
+  } else {
+    console.error("No file selected");
+  }
+}
 </script>
 
 <style scoped>

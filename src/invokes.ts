@@ -238,6 +238,7 @@ export const gameInit = async (
 };
 
 export const gameLoad = async (pfsFile: string ): Promise<string | null> => {
+  console.log("Loading pfsFile: " + pfsFile);
   return await invoke("game_load", { pfsFile });
 };
 

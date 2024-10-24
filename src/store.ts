@@ -113,16 +113,19 @@ export const useStore = defineStore("app", {
     isSolverFinished: false,
     isSolverError: false,
     isFinalizing: false,
+    isSolverLoaded: false,
   }),
 
   getters: {
     hasSolverRun: (state) => {
+      console.log("state:", state);
       return (
         state.isSolverRunning ||
         state.isSolverPaused ||
         state.isSolverFinished ||
         state.isSolverError ||
-        state.isFinalizing
+        state.isFinalizing ||
+        state.isSolverLoaded
       );
     },
   },
