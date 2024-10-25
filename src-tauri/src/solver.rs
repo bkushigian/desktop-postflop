@@ -70,7 +70,17 @@ pub fn game_load(
     game_state: tauri::State<Mutex<PostFlopGame>>,
     pfs_file: String
 ) -> Option<String> {
-    Some("Error: Not Implemented".to_string())
+    println!("Loading file {}", pfs_file);
+    let loaded = load_data_from_file(&pfs_file, None);
+    println!("loaded: ok?{}", loaded.is_ok());
+    match loaded {
+        Ok((game, _memo)) => {
+            println!("Successfully loaded game");
+            *game_state.lock().unwrap() = game;
+        },
+        Err(s) => return Some(s)
+    }
+    None
 }
 
 #[tauri::command(async)]
