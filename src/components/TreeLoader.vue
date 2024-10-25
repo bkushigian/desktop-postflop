@@ -4,7 +4,6 @@
     <input
       type="file"
       ref="fileInput"
-      @change="handleFileUpload"
       accept=".pfs"
       style="display: none;"
     />
@@ -16,34 +15,40 @@
     </button>
   </div>
   <div>
-   <p v-if="error" style="color: red;">Error: {{ error }}</p>
+   <p v-if="loadErrorMsg" style="color: red;">Error: {{ loadErrorMsg }}</p>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+<script setup lang="ts">
+import { ref, Ref } from 'vue';
 import { useStore } from "../store";
 import { dialog } from '@tauri-apps/api';
 import * as invokes from "../invokes";
 
 // We need the store for loading trees.
 const store = useStore();
-const treePath = ref(null); // to store the file path
-const loadErrorMsg = ref(null);    // to store the error message
+const treePath: Ref<null | string> = ref(null); // to store the file path
+const loadErrorMsg: Ref<null | string> = ref(null);    // to store the error message
 
 async function openFileDialog() {
   try {
-    const selectedPath = await dialog.open({ multiple: false });
-    if (selectedPath) {
-      treePath.value = selectedPath;
-      console.log("Selected file path:", treePath.value);
+    const selectedPath: string | string[] | null = await dialog.open({ multiple: false });
+    if (selectedPath !== null) {
+      if (typeof selectedPath === 'string') {
+        treePath.value = (selectedPath as string);
+        console.log("Selected file path:", treePath.value);
+      }
+      else {
+        treePath.value = selectedPath[0] as string;
+        console.error("Expected a single file, but got an array of files.");
+      }
     }
   } catch (error) {
     console.error("Error selecting file:", error);
   }
 }
 
-async function promptUserAndLoadTree(resolve) {
+async function promptUserAndLoadTree() {
   const oldFilePath = treePath.value;
   treePath.value = null;
   await openFileDialog();
