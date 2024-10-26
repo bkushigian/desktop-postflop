@@ -9,7 +9,8 @@
     "build": "vue-tsc && vite build",
     "tauri": "tauri",
     "lint": "eslint src/**/*.{ts,vue}",
-    "format": "prettier --write src/**/*.{ts,vue}"
+    "format": "prettier --write src/**/*.{ts,vue}",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@heroicons/vue": "^2.0.18",
