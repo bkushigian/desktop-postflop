@@ -176,9 +176,19 @@ const chanceReports = ref<ChanceReports | null>(null);
 const totalBetAmount = ref([0, 0]);
 
 const isSolverFinished = ref(false);
+const isSolverLoaded = ref(false);
 store.$subscribe(async (_, store) => {
+  console.log("store.subscribe...");
   if (isSolverFinished.value !== store.isSolverFinished) {
     if ((isSolverFinished.value = store.isSolverFinished)) {
+      await init();
+    } else {
+      clear();
+    }
+  }
+  if (isSolverLoaded.value !== store.isSolverLoaded) {
+    if ((isSolverLoaded.value = store.isSolverLoaded)) {
+      console.log("...init");
       await init();
     } else {
       clear();
@@ -207,6 +217,7 @@ const onUpdateSpot = (
   newChanceReports: ChanceReports | null,
   newTotalBetAmount: number[]
 ) => {
+  console.log("onUpdateSpot()", newCurrentBoard);
   dealtCard.value = -1;
   selectedSpot.value = newSelectedSpot;
   selectedChance.value = newSelectedChance;

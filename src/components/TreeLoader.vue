@@ -73,14 +73,15 @@ async function loadTree(treePath: string) {
       if (loadErrorMsg.value) {
         console.log("Couldn't load tree: ", loadErrorMsg.value);
       } else {
-        store.isSolverLoaded = true;
-        store.isSolverFinished = true;
         store.navView = "results";
         console.log("store", store);
         console.log("Successfully loaded tree: ", treePath);
         const gameConfigJson = await invokes.getGameConfig();
         if (typeof gameConfigJson === "object") {
+          store.isSolverLoaded = false;
           await updateConfigStoreFromTreeConfig(gameConfigJson);
+          store.isSolverLoaded = true;
+          store.isSolverFinished = true;
           
         } else {
           // TODO: Go into error state
@@ -95,7 +96,7 @@ async function loadTree(treePath: string) {
   }
 }
 
-async function updateConfigStoreFromTreeConfig(gameConfig: Record<string, any>): void {
+async function updateConfigStoreFromTreeConfig(gameConfig: Record<string, any>) {
   console.log("config " + JSON.stringify(gameConfig, null, 2) + " was loaded and is object" )
   const cc = gameConfig["card_config"];
   const tc = gameConfig["tree_config"];
