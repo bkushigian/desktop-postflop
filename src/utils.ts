@@ -68,10 +68,50 @@ export const cardPairCellIndex = (card1: number, card2: number) => {
     index: isSuited
       ? 3 - hs
       : hr === lr
-      ? 6 - ((ls * (5 - ls)) / 2 + hs)
-      : 11 - (3 * hs + ls - +(hs < ls)),
+        ? 6 - ((ls * (5 - ls)) / 2 + hs)
+        : 11 - (3 * hs + ls - +(hs < ls)),
   };
 };
+
+export const flopTurnRiverToBoard = (flop: string, turn: string, river: string): number[] => {
+  flop.replace(" ", "");
+  const board = [];
+  if (flop.length != 6) {
+    // TODO: Handle Error
+  } else {
+    const c1 = parseCardString(flop.substring(0, 2));
+    const c2 = parseCardString(flop.substring(2, 4));
+    const c3 = parseCardString(flop.substring(4, 6));
+    if (c1 === null || c2 === null || c3 === null) {
+      // TODO: Handle Error
+    } else {
+      board.push(c1);
+      board.push(c2);
+      board.push(c3);
+    }
+  }
+  if (turn != "NOT_DEALT") {
+    const c4 = parseCardString(turn.trim().replace(" ", ""));
+    if (c4 === null) {
+      // TODO: Handle Error
+    } else {
+      board.push(c4);
+    }
+  }
+  if (river != "NOT_DEALT") {
+    if (turn === null) {
+      // TODO: Handle Error
+    }
+    const c5 = parseCardString(river.trim().replace(" ", ""));
+    if (c5 === null) {
+      // TODO: Handle Error
+    } else {
+      board.push(c5);
+    }
+  }
+
+  return board;
+}
 
 export const cardPairOrder = (pair: number) => {
   let card1 = pair & 0xff;

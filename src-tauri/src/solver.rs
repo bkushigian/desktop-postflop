@@ -2,6 +2,7 @@ use crate::range::*;
 use postflop_solver::*;
 use rayon::ThreadPool;
 use serde::Serialize;
+use serde_json::Value;
 use std::sync::Mutex;
 
 #[inline]
@@ -68,7 +69,7 @@ pub fn weighted_average(slice: &[f32], weights: &[f32]) -> f64 {
 #[tauri::command(async)]
 pub fn game_load(
     game_state: tauri::State<Mutex<PostFlopGame>>,
-    pfs_file: String
+    pfs_file: String,
 ) -> Option<String> {
     println!("Loading file {}", pfs_file);
     let loaded = load_data_from_file(&pfs_file, None);
@@ -77,13 +78,14 @@ pub fn game_load(
         Ok((game, _memo)) => {
             println!("Successfully loaded game");
             *game_state.lock().unwrap() = game;
-        },
-        Err(s) => return Some(s)
+        }
+        Err(s) => return Some(s),
     }
     None
 }
 
 #[tauri::command(async)]
+#[allow(clippy::too_many_arguments)]
 pub fn game_init(
     range_state: tauri::State<Mutex<RangeManager>>,
     game_state: tauri::State<Mutex<PostFlopGame>>,
@@ -285,6 +287,16 @@ pub fn game_total_bet_amount(
     let ret = game.total_bet_amount();
     game.apply_history(&history);
     ret
+}
+
+#[tauri::command]
+pub fn game_config(game_state: tauri::State<Mutex<PostFlopGame>>) -> Result<Value, String> {
+    let game = game_state.lock().unwrap();
+    let configs_json = game.configs_as_json();
+    if let Ok(c) = &configs_json {
+        println!("{}", c);
+    }
+    configs_json
 }
 
 fn actions(game: &PostFlopGame) -> Vec<String> {

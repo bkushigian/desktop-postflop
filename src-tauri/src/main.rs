@@ -66,6 +66,7 @@ fn main() {
             game_finalize,
             game_apply_history,
             game_total_bet_amount,
+            game_config,
             game_actions_after,
             game_possible_cards,
             game_get_results,

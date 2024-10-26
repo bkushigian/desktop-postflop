@@ -237,8 +237,7 @@ export const gameInit = async (
   });
 };
 
-export const gameLoad = async (pfsFile: string ): Promise<string | null> => {
-  console.log("Loading pfsFile: " + pfsFile);
+export const gameLoad = async (pfsFile: string): Promise<string | null> => {
   return await invoke("game_load", { pfsFile });
 };
 
@@ -291,6 +290,18 @@ export const gameActionsAfter = async (append: number[]): Promise<string[]> => {
 export const gamePossibleCards = async (): Promise<bigint> => {
   return BigInt(await invoke("game_possible_cards"));
 };
+
+export const getGameConfig = async (): Promise<Record<string, any> | string> => {
+  const gameConfig = await invoke("game_config");
+  if (typeof gameConfig === "object" && gameConfig !== null) {
+    return gameConfig;
+  }
+  else if (typeof gameConfig === "string") {
+    console.log("Error serializing tree config: " + gameConfig);
+    return gameConfig;
+  }
+  return "Unknown error getting game config";
+}
 
 type ResultsResponse = {
   current_player: "oop" | "ip" | "chance" | "terminal";
