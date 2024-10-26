@@ -3,7 +3,10 @@ import { sanitizeBetString } from "./utils";
 
 export type NavView = "solver" | "results" | "file";
 
-export type SideView =
+/**
+ * Side View for the Solver Tab
+ */
+export type SolverTabSideView =
   | "oop-range"
   | "ip-range"
   | "board"
@@ -12,12 +15,18 @@ export type SideView =
   | "run-solver"
   | "about";
 
-  export type FileSideView = 
+/**
+ *  Side View for the File Tab
+ */
+export type FileTabSideView =
   | "save-tree"
   | "load-tree"
   | "load-and-resolve-tree"
 
-export const saveConfigTmp = () => {
+/**
+ * Saves {@code config} to {@code tmpConfig}
+ */
+export const saveConfigToTmp = () => {
   const config = useConfigStore();
   const tmpConfig = useTmpConfigStore();
 
@@ -51,7 +60,10 @@ export const saveConfigTmp = () => {
   });
 };
 
-export const saveConfig = () => {
+/**
+ * Saves {@code tmpConfig} to {@code savedConfig}
+ */
+export const saveTmpConfigToSavedConfig = () => {
   const tmpConfig = useTmpConfigStore();
   const savedConfig = useSavedConfigStore();
 
@@ -88,8 +100,8 @@ export const saveConfig = () => {
 export const useStore = defineStore("app", {
   state: () => ({
     navView: "solver" as NavView,
-    sideView: "oop-range" as SideView,
-    fileSideView: "load-tree" as FileSideView,
+    solverSideView: "oop-range" as SolverTabSideView,
+    fileSideView: "load-tree" as FileTabSideView,
     headers: {
       about: ["About"],
       "oop-range": ["OOP Range"],

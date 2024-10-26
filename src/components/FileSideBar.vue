@@ -29,12 +29,12 @@
 </template>
 
 <script setup lang="ts">
-import { FileSideView, useStore, useConfigStore } from "../store";
+import { FileTabSideView, useStore, useConfigStore } from "../store";
 
 
 const store = useStore();
 
-const itemStyle = (view: FileSideView) => {
+const itemStyle = (view: FileTabSideView) => {
   return (
     "side-bar-item " + (view === store.fileSideView ? "font-bold bg-blue-100" : "")
   );

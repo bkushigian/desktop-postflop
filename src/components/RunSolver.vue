@@ -320,8 +320,8 @@ import {
   useConfigStore,
   useTmpConfigStore,
   useSavedConfigStore,
-  saveConfigTmp,
-  saveConfig,
+  saveConfigToTmp,
+  saveTmpConfigToSavedConfig,
 } from "../store";
 import {
   MAX_AMOUNT,
@@ -552,7 +552,7 @@ const buildTree = async () => {
     return;
   }
 
-  saveConfigTmp();
+  saveConfigToTmp();
   isTreeBuilding.value = true;
   treeStatus.value = "Building tree...";
 
@@ -590,7 +590,7 @@ const buildTree = async () => {
     return;
   }
 
-  saveConfig();
+  saveTmpConfigToSavedConfig();
 
   [memoryUsageRaw.value, memoryUsageRawCompressed.value] =
     await invokes.gameMemoryUsage();

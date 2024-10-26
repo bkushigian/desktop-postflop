@@ -25,25 +25,25 @@
           </div>
         </div>
 
-        <div v-show="store.sideView === 'oop-range'">
+        <div v-show="store.solverSideView === 'oop-range'">
           <RangeEditor :player="0" />
         </div>
-        <div v-show="store.sideView === 'ip-range'">
+        <div v-show="store.solverSideView === 'ip-range'">
           <RangeEditor :player="1" />
         </div>
-        <div v-show="store.sideView === 'board'">
+        <div v-show="store.solverSideView === 'board'">
           <BoardSelector />
         </div>
-        <div v-show="store.sideView === 'tree-config'">
+        <div v-show="store.solverSideView === 'tree-config'">
           <TreeConfig />
         </div>
-        <div v-show="store.sideView === 'bunching'">
+        <div v-show="store.solverSideView === 'bunching'">
           <BunchingEffect />
         </div>
-        <div v-show="store.sideView === 'run-solver'">
+        <div v-show="store.solverSideView === 'run-solver'">
           <RunSolver />
         </div>
-        <div v-if="store.sideView === 'about'">
+        <div v-if="store.solverSideView === 'about'">
           <AboutPage />
         </div>
       </div>
@@ -120,7 +120,7 @@ import AboutPage from "./AboutPage.vue";
 import ResultViewer from "./ResultViewer.vue";
 
 const store = useStore();
-const header = computed(() => store.headers[store.sideView].join(" > "));
+const header = computed(() => store.headers[store.solverSideView].join(" > "));
 const fileHeader = computed(() => store.headers[store.fileSideView].join(" > "));
 
 const clientHeight = ref(0);

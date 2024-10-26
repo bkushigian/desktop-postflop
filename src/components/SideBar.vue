@@ -2,7 +2,7 @@
   <aside class="flex flex-col shrink-0 w-56 my-4 overflow-y-auto border-r-2">
     <button
       :class="itemStyle('oop-range')"
-      @click="store.sideView = 'oop-range'"
+      @click="store.solverSideView = 'oop-range'"
     >
       OOP Range
       <span class="flex my-2 justify-center">
@@ -10,14 +10,14 @@
       </span>
     </button>
 
-    <button :class="itemStyle('ip-range')" @click="store.sideView = 'ip-range'">
+    <button :class="itemStyle('ip-range')" @click="store.solverSideView = 'ip-range'">
       IP Range
       <span class="flex my-2 justify-center">
         <RangeMiniViewer :player="1" />
       </span>
     </button>
 
-    <button :class="itemStyle('board')" @click="store.sideView = 'board'">
+    <button :class="itemStyle('board')" @click="store.solverSideView = 'board'">
       Board
       <span class="flex mt-1 justify-center font-semibold">
         <span
@@ -34,23 +34,23 @@
 
     <button
       :class="itemStyle('tree-config')"
-      @click="store.sideView = 'tree-config'"
+      @click="store.solverSideView = 'tree-config'"
     >
       Tree Configuration
     </button>
 
-    <button :class="itemStyle('bunching')" @click="store.sideView = 'bunching'">
+    <button :class="itemStyle('bunching')" @click="store.solverSideView = 'bunching'">
       Bunching Effect
     </button>
 
     <button
       :class="itemStyle('run-solver')"
-      @click="store.sideView = 'run-solver'"
+      @click="store.solverSideView = 'run-solver'"
     >
       Run Solver
     </button>
 
-    <button :class="itemStyle('about')" @click="store.sideView = 'about'">
+    <button :class="itemStyle('about')" @click="store.solverSideView = 'about'">
       About
     </button>
   </aside>
@@ -58,7 +58,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { SideView, useStore, useConfigStore } from "../store";
+import { SolverTabSideView, useStore, useConfigStore } from "../store";
 import { cardText } from "../utils";
 
 import RangeMiniViewer from "./RangeMiniViewer.vue";
@@ -66,9 +66,9 @@ import RangeMiniViewer from "./RangeMiniViewer.vue";
 const store = useStore();
 const config = useConfigStore();
 
-const itemStyle = (view: SideView) => {
+const itemStyle = (view: SolverTabSideView) => {
   return (
-    "side-bar-item " + (view === store.sideView ? "font-bold bg-blue-100" : "")
+    "side-bar-item " + (view === store.solverSideView ? "font-bold bg-blue-100" : "")
   );
 };
 
