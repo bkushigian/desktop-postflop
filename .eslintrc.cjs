@@ -1,3 +1,5 @@
+const { EndOfLineState } = require("typescript");
+
 /* eslint-env node */
 require("@rushstack/eslint-patch/modern-module-resolution");
 
@@ -10,4 +12,7 @@ module.exports = {
   rules: {
     "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
   },
+  error: {
+    "endOfLine": "auto"
+  }
 };
