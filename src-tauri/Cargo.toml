@@ -16,14 +16,14 @@ tauri-build = { version = "1.5.0", features = [] }
 [dependencies]
 serde_json = "1.0.107"
 serde = { version = "1.0.188", features = ["derive"] }
-tauri = { version = "1.5.0", features = [
+tauri = { version = "1.5.0", features = [ "fs-create-dir", "path-all",
     "dialog-open",
     "dialog-save",
     "fs-read-file",
     "fs-write-file",
     "shell-open",
 ] }
-postflop-solver = { git = "https://github.com/bkushigian/postflop-solver", branch="bkushigian/issue14-serde-tree-config", features = [
+postflop-solver = { git = "https://github.com/bkushigian/postflop-solver", branch = "bkushigian/issue14-serde-tree-config", features = [
     "custom-alloc",
 ] }
 rayon = "1.8.0"

@@ -2094,7 +2094,7 @@ dependencies = [
 [[package]]
 name = "postflop-solver"
 version = "0.1.1"
-source = "git+https://github.com/bkushigian/postflop-solver?branch=bkushigian/issue14-serde-tree-config#23246057c453e396dd38166da762e0986b99744a"
+source = "git+https://github.com/bkushigian/postflop-solver?branch=bkushigian/issue14-serde-tree-config#e44a1901609c21c09e6f16c748bb13ed91eb9248"
 dependencies = [
  "bincode",
  "clap",
