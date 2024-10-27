@@ -12,6 +12,8 @@
         ? "Solver has not run."
         : store.isSolverRunning
         ? "Solver running..."
+        : store.isTreeLoading
+        ? `Loading ${store.loadedTreePath}...`
         : store.isFinalizing
         ? "Finalizing..."
         : store.isSolverError
@@ -157,6 +159,7 @@ import ResultTable from "./ResultTable.vue";
 import ResultCompare from "./ResultCompare.vue";
 import ResultGraphs from "./ResultGraphs.vue";
 import ResultChance from "./ResultChance.vue";
+import { debug } from "../log";
 
 const store = useStore();
 
@@ -178,6 +181,7 @@ const totalBetAmount = ref([0, 0]);
 const isSolverFinished = ref(false);
 const isSolverLoaded = ref(false);
 store.$subscribe(async (_, store) => {
+  debug("store.$subscribe");
   console.log("store.subscribe...");
   if (isSolverFinished.value !== store.isSolverFinished) {
     if ((isSolverFinished.value = store.isSolverFinished)) {
@@ -186,8 +190,8 @@ store.$subscribe(async (_, store) => {
       clear();
     }
   }
-  if (isSolverLoaded.value !== store.isSolverLoaded) {
-    if ((isSolverLoaded.value = store.isSolverLoaded)) {
+  if (isSolverLoaded.value !== store.isTreeLoaded) {
+    if ((isSolverLoaded.value = store.isTreeLoaded)) {
       console.log("...init");
       await init();
     } else {

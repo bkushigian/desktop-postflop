@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { sanitizeBetString } from "./utils";
+import { debug, trace } from "./log";
 
 export type NavView = "solver" | "results" | "file";
 
@@ -27,6 +28,7 @@ export type FileTabSideView =
  * Saves {@code config} to {@code tmpConfig}
  */
 export const saveConfigToTmp = () => {
+  debug("Saving config to tmpConfig");
   const config = useConfigStore();
   const tmpConfig = useTmpConfigStore();
 
@@ -64,6 +66,7 @@ export const saveConfigToTmp = () => {
  * Saves {@code tmpConfig} to {@code savedConfig}
  */
 export const saveTmpConfigToSavedConfig = () => {
+  debug("Saving tmpConfig to savedConfig");
   const tmpConfig = useTmpConfigStore();
   const savedConfig = useSavedConfigStore();
 
@@ -125,19 +128,22 @@ export const useStore = defineStore("app", {
     isSolverFinished: false,
     isSolverError: false,
     isFinalizing: false,
-    isSolverLoaded: false,
+    isConfigLoaded: false,
+    isTreeLoading: false,
+    isTreeLoaded: false,
+    loadedTreePath: "",
   }),
 
   getters: {
     hasSolverRun: (state) => {
-      console.log("state:", state);
+      trace(`hasSolverRun()`);
       return (
         state.isSolverRunning ||
         state.isSolverPaused ||
         state.isSolverFinished ||
         state.isSolverError ||
         state.isFinalizing ||
-        state.isSolverLoaded
+        state.isTreeLoaded
       );
     },
   },

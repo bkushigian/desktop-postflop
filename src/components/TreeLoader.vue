@@ -25,6 +25,7 @@ import { useStore, useConfigStore, saveConfigToTmp, saveTmpConfigToSavedConfig }
 import { dialog } from '@tauri-apps/api';
 import * as invokes from "../invokes";
 import { flopTurnRiverToBoard } from '../utils';
+import { debug, error, trace } from '../log';
 
 // We need the store for loading trees.
 const store = useStore();
@@ -33,12 +34,13 @@ const treePath: Ref<null | string> = ref(null); // to store the file path
 const loadErrorMsg: Ref<null | string> = ref(null);    // to store the error message
 
 async function openFileDialog() {
+  trace(`openFileDialog()`);
   try {
     const selectedPath: string | string[] | null = await dialog.open({ multiple: false });
     if (selectedPath !== null) {
       if (typeof selectedPath === 'string') {
         treePath.value = (selectedPath as string);
-        console.log("Selected file path:", treePath.value);
+        debug("Selected file path:", treePath.value);
       }
       else {
         treePath.value = selectedPath[0] as string;
@@ -51,6 +53,7 @@ async function openFileDialog() {
 }
 
 async function promptUserAndLoadTree() {
+  trace(`promptUserAndLoadTree()`);
   const oldFilePath = treePath.value;
   treePath.value = null;
   await openFileDialog();
@@ -67,43 +70,59 @@ async function promptUserAndLoadTree() {
  * TODO: Specify failure modes
  */
 async function loadTree(treePath: string) {
+  trace(`Loading tree ${treePath}`);
   if (treePath) {
     try {
+      store.isTreeLoaded = false;
+      store.isSolverFinished = false;
+      store.isTreeLoading = true;
+      store.isConfigLoaded = false;
+      store.loadedTreePath = "";
+
       loadErrorMsg.value = await invokes.gameLoad(treePath);
+
       if (loadErrorMsg.value) {
-        console.log("Couldn't load tree: ", loadErrorMsg.value);
+        error(`Couldn't load tree: ${loadErrorMsg.value}`);
       } else {
+        store.isTreeLoaded = true;
+        store.isSolverFinished = true;
+        store.isTreeLoading = false;
+        store.loadedTreePath = treePath;
+        store.isSolverError = false;
+        debug(`Successfully loaded tree: ${treePath}`);
+
         store.navView = "results";
-        console.log("store", store);
-        console.log("Successfully loaded tree: ", treePath);
         const gameConfigJson = await invokes.getGameConfig();
         if (typeof gameConfigJson === "object") {
-          store.isSolverLoaded = false;
+          store.isConfigLoaded = false;
           await updateConfigStoreFromTreeConfig(gameConfigJson);
-          store.isSolverLoaded = true;
-          store.isSolverFinished = true;
-          
+          store.isConfigLoaded = true;
         } else {
-          // TODO: Go into error state
+          error("Error");
+          store.isSolverError = true;
         }
         
       }
     } catch (error) {
-      console.error("Error invoking backend:", error);
+      const message = `Error invoking backend: ${error}`;
+      debug(message);
     }
   } else {
     console.error("No file selected");
   }
 }
 
-async function updateConfigStoreFromTreeConfig(gameConfig: Record<string, any>) {
-  console.log("config " + JSON.stringify(gameConfig, null, 2) + " was loaded and is object" )
+/**
+ * Update the config from the {@code gameConfig} record.
+ * 
+ */
+async function updateConfigStoreFromTreeConfig(gameConfig: Record<string, any>): Promise<string | null>{
   const cc = gameConfig["card_config"];
   const tc = gameConfig["tree_config"];
-  console.log("cardConfig " + JSON.stringify(cc) + " was loaded and is object" )
-  console.log("treeConfig " + JSON.stringify(tc) + " was loaded and is object" )
-
-  "abc".replace("%", "");
+  debug("cardConfig:\n" + JSON.stringify(cc, null, 2) + "\nwas loaded and is object" )
+  debug("treeConfig:\n" + JSON.stringify(tc) + "\nwas loaded and is object" )
+  debug("addedLines:", config.addedLines);
+  debug("removedLines:", config.removedLines);
 
   // Update config
   config.board = flopTurnRiverToBoard(cc.flop, cc.turn, cc.river);
@@ -136,31 +155,38 @@ async function updateConfigStoreFromTreeConfig(gameConfig: Record<string, any>) 
   config.mergingThreshold = tc.merging_threshold * 100;
 
   const oopRangeErrorString = await invokes.rangeFromString(0, cc.range[0]);
+  if (oopRangeErrorString) {
+    error(oopRangeErrorString);
+    store.isSolverError = true;
+    return oopRangeErrorString;
+  }
+
   const ipRangeErrorString = await invokes.rangeFromString(1, cc.range[1]);
-  console.log(oopRangeErrorString);
-  console.log(ipRangeErrorString);
+  if (ipRangeErrorString) {
+    error(ipRangeErrorString);
+    store.isSolverError = true;
+    return ipRangeErrorString;
+  }
 
   const oopWeights = await invokes.rangeGetWeights(0);
   for (let i = 0; i < 13 * 13; ++i) {
     store.ranges[0][i] = oopWeights[i] * 100;
   }
+  debug("oopWeights:[", oopWeights.join(","), "]");
 
   const ipWeights = await invokes.rangeGetWeights(1);
   for (let i = 0; i < 13 * 13; ++i) {
     store.ranges[1][i] = ipWeights[i] * 100;
   }
+  debug("ipWeights:[", ipWeights.join(","), "]");
 
 
   // TODO: What do we do with this?
   // config.expectedBoardLength = config.board.length;
 
-  // Update store
-
-  console.log("parsed config: ", JSON.stringify(config, null, 2));
-}
-function updateConfigFromCurrentTree(): void {
-
-
+  saveConfigToTmp();
+  saveTmpConfigToSavedConfig();
+  return null;
 }
 </script>
 

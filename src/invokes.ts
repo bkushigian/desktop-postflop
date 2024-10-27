@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 import { Results, ChanceReports } from "./result-types";
+import { error } from "./log";
 
 export const osName = async (): Promise<"windows" | "macos" | "linux"> => {
   return await invoke("os_name");
@@ -36,6 +37,13 @@ export const rangeUpdate = async (
   await invoke("range_update", { player, row, col, weight });
 };
 
+/**
+ * 
+ * Parse range string and, if successful, apply it to {@code player}
+ * @param player {@code 0} for OOP or {@code 1} for IP
+ * @param str the range string to parse apply
+ * @returns {@code None} on success, or {@code error: String} on failure
+ */
 export const rangeFromString = async (
   player: number,
   str: string
@@ -43,6 +51,11 @@ export const rangeFromString = async (
   return await invoke("range_from_string", { player, str });
 };
 
+/**
+ * 
+ * @param player {@code 0} for OOP or {@code 1} for IP
+ * @returns {@code player}'s range as a {@code string}
+ */
 export const rangeToString = async (player: number): Promise<string> => {
   return await invoke("range_to_string", { player });
 };
@@ -297,7 +310,7 @@ export const getGameConfig = async (): Promise<Record<string, any> | string> => 
     return gameConfig;
   }
   else if (typeof gameConfig === "string") {
-    console.log("Error serializing tree config: " + gameConfig);
+    error("Error serializing tree config:", gameConfig);
     return gameConfig;
   }
   return "Unknown error getting game config";

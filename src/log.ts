@@ -13,28 +13,29 @@ function getTimestampedLogFileName() {
 
 const THIS_SESSION_LOG_FILE_NAME = 'logs/' + getTimestampedLogFileName();
 
-export async function error(message: string) {
-    await log(message, "ERROR");
+export async function error(...message: string[]) {
+    await log("ERROR", ...message);
 }
 
-export async function info(message: string) {
-    await log(message, "INFO");
+export async function info(...message: string[]) {
+    await log("INFO", ...message);
 }
 
-export async function warning(message: string) {
-    await log(message, "WARN");
+export async function warning(...message: string[]) {
+    await log("WARN", ...message);
 }
 
-export async function debug(message: string) {
-    await log(message, "DEBUG");
+export async function debug(...message: string[]) {
+    await log("DEBUG", ...message);
 }
 
-export async function trace(message: string) {
-    await log(message, "TRACE");
+export async function trace(...message: string[]) {
+    await log("TRACE", ...message);
 }
 
-export async function log(message: string, level: string) {
-    const contents = `[${level.toUpperCase()}][${new Date().toISOString()}] ${message}\n`;
+export async function log(level: string, ...message: string[]) {
+    const joinedMessage = message.join(" ");
+    const contents = `[${level.toUpperCase()}][${new Date().toISOString()}] ${joinedMessage}\n`;
     await writeFile(
       { path: THIS_SESSION_LOG_FILE_NAME, contents },
       { dir: BaseDirectory.AppData, append: true }

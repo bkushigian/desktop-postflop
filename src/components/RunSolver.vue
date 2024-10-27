@@ -556,6 +556,9 @@ const buildTree = async () => {
   isTreeBuilding.value = true;
   treeStatus.value = "Building tree...";
 
+  store.isTreeLoading = false;
+  store.isTreeLoaded = false;
+  store.loadedTreePath = "";
   const errorString = await invokes.gameInit(
     tmpConfig.board,
     tmpConfig.startingPot,
