@@ -172,14 +172,13 @@ async function updateConfigStoreFromTreeConfig(gameConfig: Record<string, any>):
   for (let i = 0; i < 13 * 13; ++i) {
     store.ranges[0][i] = oopWeights[i] * 100;
   }
-  debug("oopWeights:[", oopWeights.join(","), "]");
 
   const ipWeights = await invokes.rangeGetWeights(1);
   for (let i = 0; i < 13 * 13; ++i) {
     store.ranges[1][i] = ipWeights[i] * 100;
   }
-  debug("ipWeights:[", ipWeights.join(","), "]");
 
+  debug("Loaded config");
 
   // TODO: What do we do with this?
   // config.expectedBoardLength = config.board.length;
