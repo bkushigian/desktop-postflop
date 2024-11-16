@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 import { Results, ChanceReports } from "./result-types";
-import { error } from "./log";
+import { error, trace } from "./log";
 
 export const osName = async (): Promise<"windows" | "macos" | "linux"> => {
   return await invoke("os_name");
@@ -297,7 +297,13 @@ export const gameTotalBetAmount = async (
 };
 
 export const gameActionsAfter = async (append: number[]): Promise<string[]> => {
-  return await invoke("game_actions_after", { append });
+  trace("gameActionsAfter()");
+  try {
+    return await invoke<string[]>("game_actions_after", { append });
+  } catch (e) {
+    error("gameActions returned an erroneous result:", String(e));
+    throw e;
+  }
 };
 
 export const gamePossibleCards = async (): Promise<bigint> => {

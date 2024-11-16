@@ -266,9 +266,12 @@ pub fn game_finalize(
 }
 
 #[tauri::command]
-pub fn game_apply_history(game_state: tauri::State<Mutex<PostFlopGame>>, history: Vec<usize>) {
+pub fn game_apply_history(
+    game_state: tauri::State<Mutex<PostFlopGame>>,
+    history: Vec<usize>,
+) -> Result<(), String> {
     let mut game = game_state.lock().unwrap();
-    game.apply_history(&history);
+    game.apply_history(&history)
 }
 
 #[tauri::command]
@@ -282,10 +285,10 @@ pub fn game_total_bet_amount(
     }
     let history = game.history().to_vec();
     for &action in &append {
-        game.play(action_usize(action));
+        game.play(action_usize(action)).unwrap();
     }
     let ret = game.total_bet_amount();
-    game.apply_history(&history);
+    game.apply_history(&history).unwrap();
     ret
 }
 
@@ -324,24 +327,27 @@ fn actions(game: &PostFlopGame) -> Vec<String> {
 pub fn game_actions_after(
     game_state: tauri::State<Mutex<PostFlopGame>>,
     append: Vec<isize>,
-) -> Vec<String> {
+) -> Result<Vec<String>, String> {
     let mut game = game_state.lock().unwrap();
     if append.is_empty() {
-        return actions(&game);
+        return Ok(actions(&game));
     }
     let history = game.history().to_vec();
     for &action in &append {
-        game.play(action_usize(action));
+        if let Err(msg) = game.play(action_usize(action)) {
+            println!("error playing action: {}", msg);
+            return Err(msg);
+        }
     }
     let ret = actions(&game);
-    game.apply_history(&history);
-    ret
+    game.apply_history(&history)?;
+    Ok(ret)
 }
 
 #[tauri::command]
 pub fn game_possible_cards(game_state: tauri::State<Mutex<PostFlopGame>>) -> u64 {
     let game = game_state.lock().unwrap();
-    game.possible_cards()
+    game.possible_cards().unwrap()
 }
 
 fn current_player(game: &PostFlopGame) -> String {
@@ -475,7 +481,7 @@ pub fn game_get_chance_reports(
     game_state: tauri::State<Mutex<PostFlopGame>>,
     append: Vec<isize>,
     num_actions: usize,
-) -> GameChanceReportsResponse {
+) -> Result<GameChanceReportsResponse, String> {
     let mut game = game_state.lock().unwrap();
     let history = game.history().to_vec();
 
@@ -486,15 +492,15 @@ pub fn game_get_chance_reports(
     let mut eqr = [vec![0.0; 52], vec![0.0; 52]];
     let mut strategy = vec![0.0; num_actions * 52];
 
-    let possible_cards = game.possible_cards();
+    let possible_cards = game.possible_cards()?;
     for chance in 0..52 {
         if possible_cards & (1 << chance) == 0 {
             continue;
         }
 
-        game.play(chance);
+        game.play(chance)?;
         for &action in &append[1..] {
-            game.play(action_usize(action));
+            game.play(action_usize(action))?;
         }
 
         let trunc = |&w: &f32| if w < 0.0005 { 0.0 } else { w };
@@ -532,7 +538,7 @@ pub fn game_get_chance_reports(
 
         if is_empty_flag[0] || is_empty_flag[1] {
             status[chance] = 1;
-            game.apply_history(&history);
+            game.apply_history(&history)?;
             continue;
         }
 
@@ -550,15 +556,15 @@ pub fn game_get_chance_reports(
             eqr[player][chance] = round(ev_tmp / (pot as f64 * equity_tmp));
         }
 
-        game.apply_history(&history);
+        game.apply_history(&history)?;
     }
 
-    GameChanceReportsResponse {
+    Ok(GameChanceReportsResponse {
         status,
         combos,
         equity,
         ev,
         eqr,
         strategy,
-    }
+    })
 }

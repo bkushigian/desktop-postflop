@@ -262,6 +262,7 @@ import {
   ChevronRightIcon,
   ChevronUpIcon,
 } from "@heroicons/vue/20/solid";
+import { debug, error, trace } from "../log";
 
 const foldColor = { red: 0x3b, green: 0x82, blue: 0xf6 }; // blue-500
 const checkColor = { red: 0x22, green: 0xc5, blue: 0x5e }; // green-500
@@ -410,6 +411,7 @@ const selectSpot = async (
   needSplice: boolean,
   fromDeal = false
 ) => {
+  trace(`selectSpot( spotIndex=${spotIndex}, needSplice=${needSplice}, fromDeal=${fromDeal} )`);
   if (
     props.isLocked ||
     (!needSplice &&
@@ -419,16 +421,19 @@ const selectSpot = async (
           isSelectedChanceSkipped.value &&
           spotIndex > selectedChanceIndex.value)))
   ) {
+    trace(`returning early`);
     return;
   }
 
   if (spotIndex === 0) {
     await selectSpot(1, true);
+    trace(`spotIndex is 0, returning early`);
     return;
   }
 
   // start processing
   emit("update:is-locked", true);
+  trace(`emitting update:is-locked`);
 
   // avoid unnecessary update of refs
   selectedSpotIndexTmp = selectedSpotIndex.value;
@@ -436,9 +441,11 @@ const selectSpot = async (
 
   // when from deal, update river dead cards and terminal equity
   if (fromDeal) {
+    trace(`fromDeal`);
     const findRiverIndex = spots.value
       .slice(selectedChanceIndexTmp + 3)
       .findIndex((spot) => spot.type === "chance");
+    trace(`findRiverIndex: ${findRiverIndex}`);
     let riverIndex = -1;
     if (findRiverIndex !== -1) {
       riverIndex = findRiverIndex + selectedChanceIndexTmp + 3;
@@ -487,11 +494,14 @@ const selectSpot = async (
 
   // update indices of selected spot and selected chance
   if (!needSplice && spots.value[spotIndex].type === "chance") {
+
+    trace(`!needSplice && spots.value[spotIndex].type === "chance"`);
     selectedChanceIndexTmp = spotIndex;
     if (selectedSpotIndexTmp < spotIndex + 1) {
       selectedSpotIndexTmp = spotIndex + 1;
     }
   } else {
+    trace(`needSplice || !spots.value[spotIndex].type === "chance"`);
     selectedSpotIndexTmp = spotIndex;
     if (spotIndex <= selectedChanceIndexTmp) {
       selectedChanceIndexTmp = -1;
@@ -516,10 +526,14 @@ const selectSpot = async (
     .map((spot) => spot.selectedIndex);
 
   // apply history
+  trace(`applying history ${history}`);
   await invokes.gameApplyHistory(history);
+  trace(`applied history`);
 
   // obtain results
+  trace(`calling gameGetResults()`);
   results = await invokes.gameGetResults();
+  // trace(`got results ${JSON.stringify(results)}`);
 
   let append: number[] = [];
   if (selectedChanceIndexTmp !== -1) {
@@ -529,7 +543,15 @@ const selectSpot = async (
   }
 
   // obtain actions after skipped chances
-  const nextActions = await invokes.gameActionsAfter(append);
+  trace(`obtaining next actions`);
+  let nextActions: string[];
+  try {
+    nextActions = await invokes.gameActionsAfter(append);
+    trace(`next actions: ${nextActions}`);
+  } catch(e) {
+    error("Found error:", String(e));
+    return;
+  }
 
   canChanceReports.value =
     selectedChanceIndexTmp !== -1 &&
@@ -540,13 +562,16 @@ const selectSpot = async (
 
   // if possible, obtain chance reports
   if (canChanceReports.value) {
+    trace(`obtaining chance report`);
     let player: "oop" | "ip" | "terminal";
     let numActions: number;
 
     if (nextActions[0] === "terminal") {
+      trace("terminal action:", nextActions[0]);
       player = "terminal";
       numActions = 0;
     } else {
+      trace("other action", nextActions[0]);
       player = append.length % 2 === 1 ? "oop" : "ip";
       numActions = nextActions.length;
     }
@@ -557,12 +582,15 @@ const selectSpot = async (
       numActions
     );
   } else {
+    trace(`could not obtain chance report`);
     chanceReports = null;
   }
 
+  trace('point 1');
   // update total bet amounts
   totalBetAmount = await invokes.gameTotalBetAmount([]);
   totalBetAmountAppended = await invokes.gameTotalBetAmount(append);
+  trace('point 2');
 
   // if need to splice, splice spots
   if (needSplice) {
@@ -574,6 +602,7 @@ const selectSpot = async (
       spliceSpotsPlayer(spotIndex, nextActions);
     }
   }
+  trace('point 3');
 
   // update action rates if necessary
   const spot = spots.value[selectedSpotIndexTmp];
@@ -592,11 +621,13 @@ const selectSpot = async (
   } else {
     rates.value = null;
   }
+  trace('point 4');
 
   // update refs
   selectedSpotIndex.value = selectedSpotIndexTmp;
   selectedChanceIndex.value = selectedChanceIndexTmp;
   isDealing.value = false;
+  trace('point 5');
 
   // emit event
   emit(
@@ -620,6 +651,7 @@ const selectSpot = async (
       });
     }
   }
+  trace('point 6');
 };
 
 const spliceSpotsTerminal = (spotIndex: number) => {
@@ -660,21 +692,31 @@ const spliceSpotsChance = async (spotIndex: number) => {
   const turnSpot = spots.value
     .slice(0, spotIndex)
     .find((spot) => spot.player === "turn") as SpotTurn | undefined;
+  trace("prev spot", JSON.stringify(prevSpot));
+  trace("turn spot", turnSpot === undefined ? "undefined" : JSON.stringify(turnSpot));
 
   let append: number[] = [];
+  trace("selectedChanceIndexTmp", selectedChanceIndexTmp.toString());
   if (selectedChanceIndexTmp !== -1) {
     append = spots.value
       .slice(selectedChanceIndexTmp, spotIndex)
       .map((spot) => spot.selectedIndex);
   }
+  trace("append", append.toString());
 
   let possibleCards = 0n;
   if (!(turnSpot?.type === "chance" && turnSpot.selectedIndex === -1)) {
     possibleCards = await invokes.gamePossibleCards();
   }
+  trace("possibleCards", possibleCards.toString());
 
   append.push(-1);
   const nextActions = await invokes.gameActionsAfter(append);
+  trace("nextActions", nextActions.toString());
+  if (typeof (nextActions) === 'string') {
+    trace("Error getting next actions:", nextActions);
+    return;
+  }
 
   let numBetActions = nextActions.length;
   while (
@@ -764,6 +806,7 @@ const spliceSpotsPlayer = (spotIndex: number, actions: string[]) => {
 };
 
 const play = async (spotIndex: number, actionIndex: number) => {
+  trace(`play( spotIndex=${spotIndex}, actionIndex=${actionIndex} )`)
   const spot = spots.value[spotIndex] as SpotPlayer;
 
   if (spot.selectedIndex !== -1) {
@@ -771,8 +814,9 @@ const play = async (spotIndex: number, actionIndex: number) => {
   }
   spot.actions[actionIndex].isSelected = true;
   spot.selectedIndex = actionIndex;
-
+  trace("about to await selectSpot");
   await selectSpot(spotIndex + 1, true);
+  trace("selectSpot returned");
 };
 
 const deal = async (card: number) => {
